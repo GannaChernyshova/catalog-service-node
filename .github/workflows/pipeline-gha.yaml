@@ -123,6 +123,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.DOCKERHUB_NAMESPACE }}/${{ env.IMAGE_PREFIX }}${{ env.IMAGE_NAME }}-gha
+
           tags: |
             type=ref,enable=true,event=branch,suffix=--{{sha}}
             type=ref,enable=true,event=branch,suffix=--latest
