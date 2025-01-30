@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'demo-*'
     tags: 
       - '*'
   pull_request:
@@ -166,7 +167,11 @@ jobs:
           exit-on: vulnerability
 
   stage-deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: |
+      github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' || 
+        startsWith(github.ref, 'refs/heads/demo-')
+      )
     name: Deploy to stage environment
     needs: [build]
     runs-on: ubuntu-latest
