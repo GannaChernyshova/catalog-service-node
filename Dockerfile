@@ -5,7 +5,7 @@
 # By using this stage, it provides a consistent base for both
 # the dev and prod versions of the image.
 ###########################################################
-FROM node:22-slim AS base
+FROM node:18 AS base
 
 # Setup a non-root user to run the app
 WORKDIR /usr/local/app
@@ -25,7 +25,7 @@ COPY --chown=appuser:appuser package.json package-lock.json ./
 FROM base AS dev
 ENV NODE_ENV=development
 RUN npm install
-CMD ["yarn", "dev-container"]
+CMD ["npm", "run", "dev-container"]
 
 
 ###########################################################
