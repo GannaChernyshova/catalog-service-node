@@ -11,31 +11,27 @@ services:
       - ./dev/webapp:/usr/local/app
 
   ############## DATABASE AND VISUALIZER ##############
-  postgres:
-    image: postgres:17.4
+  mongodb:
+    image: mongo:7.0
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - ./dev/db:/docker-entrypoint-initdb.d
+      - mongodb_data:/data/db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: catalog
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: catalog
 
-  pgadmin:
-    image: dpage/pgadmin4:9.2.0
+  mongo-express:
+    image: mongo-express:1.0.0-alpha.4
     ports:
-      - "5050:80"
-    volumes:
-      - ./dev/pgadmin/servers.json:/pgadmin4/servers.json
-      - ./dev/pgadmin/pgpass:/config/pgpass
+      - "8081:8081"
     environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin@mycomp.com
-      PGADMIN_DEFAULT_PASSWORD: secret
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongodb:27017/
     depends_on:
-      - postgres
+      - mongodb
 
   ############## LOCAL AWS ##############
   aws:
@@ -88,3 +84,6 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
     depends_on:
       - kafka
+
+volumes:
+  mongodb_data:

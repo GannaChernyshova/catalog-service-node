@@ -6,16 +6,19 @@
     }
   ],
   "servers": {
-    // The "servers" section defines the MCP servers you want to use.
-    "postgres": {
+    "mongodb": {
       "command": "docker",
       "args": [
         "run",
         "-i",
         "--rm",
-        "mcp/postgres",
-        "postgresql://postgres:postgres@host.docker.internal:5432/catalog"
-      ]
+        "-e",
+        "MDB_MCP_CONNECTION_STRING",
+        "mcp/mongodb"
+      ],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "mongodb://root:example@localhost:27017/catalog"
+      }
     }
   }
 }

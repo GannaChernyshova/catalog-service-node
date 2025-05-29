@@ -1,53 +1,54 @@
-const { Client } = require("pg");
+const { MongoClient, ObjectId } = require("mongodb");
 
 const { getInventoryForProduct } = require("./InventoryService");
 const { uploadFile, getFile } = require("./StorageService");
 const { publishEvent } = require("./PublisherService");
 
 let client;
+let db;
+
 async function getClient() {
   if (!client) {
-    // Configured using environment variables
-    client = new Client();
+    client = new MongoClient(process.env.MONGODB_URI);
     await client.connect();
+    db = client.db();
   }
-  return client;
+  return { client, db };
 }
 
 async function teardown() {
   if (client) {
-    await client.end();
+    await client.close();
   }
 }
 
 async function getProducts() {
-  const client = await getClient();
-
-  const result = await client.query("SELECT * FROM products ORDER BY id ASC");
-
-  return result.rows;
+  const { db } = await getClient();
+  return await db.collection("products").find().toArray();
 }
 
 async function createProduct(product) {
-  const client = await getClient();
+  const { db } = await getClient();
 
-  const existingProduct = await client.query(
-    "SELECT * FROM products WHERE upc = $1",
-    [product.upc],
-  );
+  const existingProduct = await db
+    .collection("products")
+    .findOne({ upc: product.upc });
 
-  if (existingProduct.rows.length > 0)
+  if (existingProduct) {
     throw new Error("Product with this UPC already exists");
+  }
 
-  const result = await client.query(
-    "INSERT INTO products (name, upc, price, description) VALUES ($1, $2, $3, $4) RETURNING id",
-    [product.name, product.upc, product.price, product.description],
-  );
-  const newProductId = result.rows[0].id;
+  const newProduct = {
+    ...product,
+    has_image: false,
+    _id: new ObjectId(),
+  };
+
+  await db.collection("products").insertOne(newProduct);
 
   publishEvent("products", {
     action: "product_created",
-    id: newProductId,
+    id: newProduct._id.toString(),
     name: product.name,
     upc: product.upc,
     price: product.price,
@@ -55,29 +56,28 @@ async function createProduct(product) {
   });
 
   return {
-    ...product,
-    id: newProductId,
+    ...newProduct,
+    id: newProduct._id.toString(),
   };
 }
 
 async function getProductById(id) {
-  const client = await getClient();
+  const { db } = await getClient();
 
-  const result = await client.query("SELECT * FROM products WHERE id = $1", [
-    id,
-  ]);
+  const product = await db
+    .collection("products")
+    .findOne({ _id: new ObjectId(id) });
 
-  if (result.rows.length === 0) {
+  if (!product) {
     return null;
   }
-
-  const product = result.rows[0];
 
   const inventory = await getInventoryForProduct(product.upc);
 
   return {
     inventory,
     ...product,
+    id: product._id.toString(),
   };
 }
 
@@ -86,10 +86,12 @@ async function getProductImage(id) {
 }
 
 async function uploadProductImage(id, buffer) {
-  const client = await getClient();
+  const { db } = await getClient();
 
   await uploadFile(id, buffer);
-  await client.query("UPDATE products SET has_image=TRUE WHERE id=$1", [id]);
+  await db
+    .collection("products")
+    .updateOne({ _id: new ObjectId(id) }, { $set: { has_image: true } });
 }
 
 module.exports = {
