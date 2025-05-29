@@ -14,10 +14,12 @@
         "--rm",
         "-e",
         "MDB_MCP_CONNECTION_STRING",
+        "--network",
+        "catalog-service-node_default",
         "mcp/mongodb"
       ],
       "env": {
-        "MDB_MCP_CONNECTION_STRING": "mongodb://root:example@localhost:27017/catalog"
+        "MDB_MCP_CONNECTION_STRING": "mongodb://root:example@mongodb:27017/catalog?authSource=admin"
       }
     }
   }
