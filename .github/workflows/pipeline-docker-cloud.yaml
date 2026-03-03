@@ -87,7 +87,7 @@ jobs:
         with:
           token: ${{ secrets.TC_CLOUD_TOKEN }}
 
-      - name: Run integration tests
+      # - name: Run integration tests
         # run: npm run integration-test
 
   build:

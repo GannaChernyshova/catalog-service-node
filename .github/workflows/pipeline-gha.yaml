@@ -82,7 +82,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_ORGNAME }}
           password: ${{ secrets.DOCKERHUB_OAT }}
 
-      - name: Run integration tests
+      # - name: Run integration tests
         # run: npm run integration-test
 
   build:
