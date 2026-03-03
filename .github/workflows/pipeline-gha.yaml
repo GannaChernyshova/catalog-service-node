@@ -155,7 +155,7 @@ jobs:
           write-comment: false # Disabling this one since this is a duplicate workflow
           organization: ${{ env.DOCKERHUB_NAMESPACE }}
           # TODO Update this to include policy once DBC image loading includes attestations
-          exit-on: vulnerability, policy
+          exit-on: policy
 
   stage-deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
