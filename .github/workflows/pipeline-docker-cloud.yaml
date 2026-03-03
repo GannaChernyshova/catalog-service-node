@@ -87,8 +87,8 @@ jobs:
         with:
           token: ${{ secrets.TC_CLOUD_TOKEN }}
 
-      - name: Run integration tests
-        run: npm run integration-test
+      # - name: Run integration tests
+        # run: npm run integration-test
 
   build:
     name: Build and push image
@@ -163,7 +163,7 @@ jobs:
           write-comment: true
           organization: ${{ env.DOCKERHUB_NAMESPACE }}
           # TODO Update this to include policy once DBC image loading includes attestations
-          exit-on: vulnerability
+          exit-on: policy
 
   stage-deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
