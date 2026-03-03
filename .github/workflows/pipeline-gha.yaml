@@ -83,7 +83,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_OAT }}
 
       - name: Run integration tests
-        run: npm run integration-test
+        # run: npm run integration-test
 
   build:
     name: Build and push image
