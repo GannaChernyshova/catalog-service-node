@@ -1,9 +1,5 @@
 {
   "jest.runMode": {
     "type": "on-demand"
-  },
-  "sonarlint.connectedMode.project": {
-    "connectionId": "demo-test-org",
-    "projectKey": "GannaChernyshova_catalog-service-node"
   }
 }
