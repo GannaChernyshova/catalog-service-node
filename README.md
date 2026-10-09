@@ -106,3 +106,5 @@ You can use **Postgres MCP** with GitHub Copilot by running it with the [`mcp.js
 ### Helper scripts
 
 In the `dev/scripts` directory, there are a few scripts that can be used to interact with the REST API of the application.
+
+Hello from Claude (2)
